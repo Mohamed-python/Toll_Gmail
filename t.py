@@ -1,4 +1,4 @@
-#5
+#3
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -38,8 +38,7 @@ class MainWindow(QMainWindow):
         self.label_8.setAlignment(Qt.AlignCenter)
         ###########
         self.tabWidget.setCurrentIndex(0)
-        self.lineEdit.setText("NADA2205")
-        self.lineEdit_2.setText("Aa963258@@")
+        
         
         self.lineEdit.setAlignment(Qt.AlignCenter)
         self.label_7.setAlignment(Qt.AlignCenter)
@@ -84,11 +83,6 @@ class MainWindow(QMainWindow):
         ###
         self.pushButton_17.clicked.connect(lambda:self.export_to_txt("y_password"))
         self.pushButton_20.clicked.connect(lambda:self.export_to_txt("n_password"))
-
-
-
-
-
     def check_and_open_browser(self):
         try:
             # Attempt to interact with the existing browser (e.g., get the title)
@@ -99,12 +93,12 @@ class MainWindow(QMainWindow):
         except Exception:
             
             return False
-    
     def close_browser(self):
         #self.driver.quit()
-        self.driver.close()
-
-
+        try:
+            self.driver.close()
+        except Exception as e:
+            print(e)
     def start(self):
         if self.lineEdit.text() != "":
             rows_count = self.list_widget.count()
@@ -159,11 +153,22 @@ class MainWindow(QMainWindow):
                     
                     
                     if rows_count == 1+i:
-                        self.driver.quit()
-                        #self.driver.close()
+                        try:
+                            self.driver.close()
+                        except:
+                            pass
+                    
                         self.label_7.setText("المتصفح مغلق")
                         self.label_7.setStyleSheet("")
-                        self.show_msg("تم الإنتهاء","تم إنتهاء الفحص")
+                        try:
+                            self.show_msg("تم الإنتهاء","تم إنتهاء الفحص")
+                        except:
+                            pass
+                        try:
+                            self.pushButton_22.hide()
+                            self.pushButton_5.show()
+                        except:
+                            pass
                         break
                     #"""
             else:
@@ -284,11 +289,10 @@ class MainWindow(QMainWindow):
                             #the number
                             file.write(f'The email number: {str(rows_count)}')
                             file.write('\n')
-                            file.write(f'PASSWORD: {self.lineEdit_3.text()}')
+                            file.write(f'PASSWORD: {self.lineEdit_2.text()}')
                         print("تم حفظ النصوص في الملف بنجاح.")
                     except Exception as e:
                         print(f"حدث خطأ أثناء حفظ الملف: {e}")
-    
     def check_word(self,target_word,booll_active):
         #target_word = self.search_input.text()
         if booll_active == True:
@@ -369,7 +373,6 @@ class MainWindow(QMainWindow):
                     else:
                         print("[!] You don't have an internet connection ")
                         self.show_msg("There is no Internet","[!] You don't have an internet connection")
-    
     ####################################
     def check_internet_connection(self):
         try:
@@ -385,6 +388,8 @@ class MainWindow(QMainWindow):
             # حذف جميع العناصر من QListWidget
             if self.list_widget.count() > 0:
                 self.list_widget.clear()
+                self.list_widget_5.clear()
+                self.list_widget_6.clear()
                 print("Done clear home")
         if name == "active":
             # حذف جميع العناصر من QListWidget
@@ -411,9 +416,6 @@ class MainWindow(QMainWindow):
             if self.listWidget_6.count() > 0:
                 self.listWidget_6.clear()
                 print("Done clear n_password")
-        
-        
-    
     def delete_row_in_home(self,name):
         # التأكد من وجود عناصر في القائمة
         if name == "home":
@@ -433,12 +435,12 @@ class MainWindow(QMainWindow):
             else:
                 print("القائمة فارغة")
     #############################
-    #"""
+    
     def test(self):
         for i in range(5):
             self.listWidget_2.addItem(f"{str(i)}")
             self.listWidget_3.addItem(f"{str(i)}") 
-    #"""
+    
     def get_first_value(self,name):
         if name == "home":
             # التأكد من وجود عناصر في القائمة
@@ -458,7 +460,6 @@ class MainWindow(QMainWindow):
                 return first_value
             else:
                 print("القائمة فارغة")
-
     def login(self,email,passwd):
             try:
                 self.url = "https://bit.ly/3t1G6fz"
@@ -561,7 +562,6 @@ class MainWindow(QMainWindow):
                     pass
 
             ###########################################
-    
     def open_file(self):
         self.clear_list("home")
         
@@ -594,7 +594,6 @@ class MainWindow(QMainWindow):
         #self.label_5.setText(f"بدء   0   من    {rows_count}")
         if rows_count:
             self.pushButton_5.setEnabled(True)
-
     ###########################################
     #تغير كلمه السر
     ###########################################
@@ -743,11 +742,8 @@ class MainWindow(QMainWindow):
                 print("لم يتم التغير")
 
         ############################################
-    
     def change_the_password(self):
-
         if self.lineEdit_2.text() != "" and self.lineEdit_3.text() != "":
-            
             self.pushButton_16.hide()
             self.pushButton_23.show()
 
@@ -757,20 +753,20 @@ class MainWindow(QMainWindow):
             elif c == False:
                 print("Browser is closed. Opening a new one.")
                 # Open a new browser instance if the existing one is closed
-                self.options = uc.ChromeOptions()
-                self.options.headless = False
-                self.driver = uc.Chrome(options = self.options)
+                try:
+                    self.options = uc.ChromeOptions()
+                    self.options.headless = False
+                    self.driver = uc.Chrome(options = self.options)
+                except Exception as e:
+                    print(e)
             #for 
             ################################
-             
+            
             print("change_the_password")
             rows_count = self.listWidget_4.count()
-            print("عدد الصفوف في QListWidget:", rows_count)
-        
             ################
             #"""
             for i in range(rows_count+1):
-                print("Hi:",str(i))
                 #"""
                 get_pass = str(self.lineEdit_2.text())
                 get_pass.replace(" ","")
@@ -794,11 +790,18 @@ class MainWindow(QMainWindow):
                 
                 #################
                 if rows_count == 1+i:
+                    try:
+                        self.driver.close()
+                    except Exception as e:
+                        print(e)
 
-                    self.driver.close()
                     self.label_7.setText("المتصفح مغلق")
                     self.label_7.setStyleSheet("")
-                    
+                    try:
+                        self.pushButton_23.hide()
+                        self.pushButton_16.show()
+                    except:
+                        pass
                     # show msg info in windows
                     try:
                         self.show_msg("تم الامر بنجاح","اكتملت عمليه التغير بنجاح")
@@ -807,9 +810,6 @@ class MainWindow(QMainWindow):
                     break
             else:
                 pass
-    
-    
-    
     def open_file_pass(self):
         self.clear_list("home_password")
         ##############
@@ -841,12 +841,11 @@ class MainWindow(QMainWindow):
             #self.label_5.setText(f"بدء   0   من    {rows_count}")
             if rows_count:
                 self.pushButton_16.setEnabled(True)
-                #self.pushButton_16.setEnabled(False)
-               
+                
+             
     ###########################################   
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    #app.setStyleSheet(stylesheet)
     window = MainWindow()
     window.show()
     app.exec_()
