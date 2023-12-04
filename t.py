@@ -3,14 +3,18 @@ from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
+
 #QClipboard
 from winotify import Notification
 
 from PyQt5.QtGui import QPixmap,QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QSize
 import sys
+import socket
 import webbrowser
 import os
+
+
 from threading import Thread
 
 class MainWindow(QMainWindow):
@@ -19,18 +23,26 @@ class MainWindow(QMainWindow):
         #self.setupUi(self)
                 
         uic.loadUi('ui/main.ui', self)
-        self.setWindowTitle("MG-Tool")
+        self.setWindowTitle("Google fillter")
 
         self.init_ui()
 
     def init_ui(self):
+        path = os.getcwd()
+        icoo = f'{str(path)}' + "//img//" + 'google_log.ico'
+        icon = QIcon(icoo)
+        self.setWindowIcon(icon)
+        self.setMinimumSize(QSize(300, 200))
+        ############
+        img  = f'{str(path)}' + "//img//" + 'google_logo_icon_170071.ico'
+        pixmap = QPixmap(img)
+        # تحديد الصورة لعنصر Label
+        self.label_8.setPixmap(pixmap)
+        self.label_8.setAlignment(Qt.AlignCenter)
+        ###########
         self.lineEdit.setText("NADA2205")
-        self.emails = []
-        self.num_email = 0
-        self.passwords = []
-        self.password = ""
-        self.dc = {}
-        
+        self.lineEdit.setAlignment(Qt.AlignCenter)
+        self.label_7.setAlignment(Qt.AlignCenter)
         self.list_widget = self.listWidget
         self.pushButton.clicked.connect(self.open_file)
         self.pushButton_2.clicked.connect(self.delete_row_in_home)
@@ -50,7 +62,7 @@ class MainWindow(QMainWindow):
         #pushButton_12
         self.pushButton_12.clicked.connect(self.test)
 
-        self.open_file()
+        #self.open_file()
     def start(self):
         cunt = 0
         print("test")
@@ -74,20 +86,29 @@ class MainWindow(QMainWindow):
             #print("*"*40)
             print(f"Email: {email}, passwprd: {get_pass}")
             self.login(email,get_pass)
+            ##################
+            check_Internet = self.check_internet_connection()
+            if check_Internet == True:
+                print("Check_Internet True")
+                self.delete_row_in_home()
+            elif check_Internet == False:
+                self.show_msg("There is no Internet","[!] You don't have an internet connection")
+
+            ###################
             self.label_5.setText(f"بدء {str(1+i)} من {rows_count}")
 
             print(f"Account Num ({str(1+i)}) from ({str(rows_count)})")
             print("*"*40)
+    
+            #self.delete_row_in_home()
             
-            self.delete_row_in_home()
-            print(rows_count , i)
             
             if rows_count == 1+i:
                 self.driver.quit()
                 #self.driver.close()
                 self.label_7.setText("المتصفح مغلق")
-                #self.label_7.setStyleSheet("")
-                self.show_msg()
+                self.label_7.setStyleSheet("")
+                self.show_msg("تم الإنتهاء","تم إنتهاء الفحص")
                 break
             #"""
             
@@ -101,11 +122,14 @@ class MainWindow(QMainWindow):
                 
         #"""
     
-    def show_msg(self):
-        toast = Notification(app_id="مرحباً",
-        title="تم الانتهاء",
-        msg="تم الإنتهاء من الفحص")
-        toast.show()
+    def show_msg(self,title,ms):
+        try:
+            toast = Notification(app_id="مرحباً",
+            title=title,
+            msg=ms)
+            toast.show()
+        except Exception as e:
+            print("Erorr show_msg")
 
     
     
@@ -121,6 +145,9 @@ class MainWindow(QMainWindow):
     def export_to_txt(self,name_file):
         # الحصول على مسار الملف المستهدف
         if name_file == "active":
+            rows_count = self.listWidget_2.count()
+            #self.label_6.setText(f"مجموع الحسابات: {rows_count}")
+            #############
             file_dialog = QFileDialog()
             file_path, _ = file_dialog.getSaveFileName(self, "حفظ في ملف نصي", "Active_accounts.txt", "ملفات النص (*.txt)")
 
@@ -131,14 +158,19 @@ class MainWindow(QMainWindow):
                         # كتابة النصوص إلى الملف
                         for i in range(self.listWidget_2.count()):
                             file.write(self.listWidget_2.item(i).text() + '\n')
-
+                        file.write('\n')
+                        file.write('\n')
+                        #the number
+                        file.write(f'The email number: {str(rows_count)}')
+                        file.write('\n')
+                        file.write(f'PASSWORD: {self.lineEdit.text()}')
                     print("تم حفظ النصوص في الملف بنجاح.")
                 except Exception as e:
                     print(f"حدث خطأ أثناء حفظ الملف: {e}")
         elif name_file == "bad":
+            rows_count = self.listWidget_3.count()
             file_dialog = QFileDialog()
             file_path, _ = file_dialog.getSaveFileName(self, "حفظ في ملف نصي", "Bad_active.txt", "ملفات النص (*.txt)")
-
             if file_path:
                 try:
                     # فتح الملف للكتابة
@@ -146,7 +178,12 @@ class MainWindow(QMainWindow):
                         # كتابة النصوص إلى الملف
                         for i in range(self.listWidget_3.count()):
                             file.write(self.listWidget_3.item(i).text() + '\n')
-
+                        file.write('\n')
+                        file.write('\n')
+                        #the number
+                        file.write(f'The email number: {str(rows_count)}')
+                        file.write('\n')
+                        file.write(f'PASSWORD: {self.lineEdit.text()}')
                     print("تم حفظ النصوص في الملف بنجاح.")
                 except Exception as e:
                     print(f"حدث خطأ أثناء حفظ الملف: {e}")
@@ -163,9 +200,16 @@ class MainWindow(QMainWindow):
                     pass
                 else:
                     #print("n")
-                    self.listWidget_2.addItem(f"{target_word}")
-                    print(f"Add Accounts Active: {target_word}")
-        
+                    check_Internet = self.check_internet_connection()
+                    if check_Internet == True:
+                        print("Check_Internet True")
+                        
+                        self.listWidget_2.addItem(f"{target_word}")
+                        print(f"Add Accounts Active: {target_word}")
+                    else:
+            
+                        print("[!] You don't have an internet connection ")
+                        self.show_msg("There is no Internet","[!] You don't have an internet connection")
         # لو معطل
         if booll_active == False:
             if target_word:
@@ -176,15 +220,29 @@ class MainWindow(QMainWindow):
                     print("found bad")
                     pass
                 else:
-                    #print("n")
-                    self.listWidget_3.addItem(f"{target_word}")
-                    print(f"send bad fuond: {target_word}")
+                    check_Internet = self.check_internet_connection()
+                    if check_Internet == True:
+                        print("Check_Internet True")
+                        
+                        self.listWidget_3.addItem(f"{target_word}")
+                        print(f"send bad fuond: {target_word}")
+                    else:
+                        print("[!] You don't have an internet connection ")
+                        self.show_msg("There is no Internet","[!] You don't have an internet connection")
+    def check_internet_connection(self):
+        try:
+            # قم بفحص اتصالك بموقع محدد، يمكنك استخدام google.com أو أي موقع آخر
+            socket.create_connection(("www.google.com", 80), timeout=5)
+            print("تم التحقق من اتصال الإنترنت بنجاح!")
+            return True
+        except OSError:
+            print("فشل في التحقق من اتصال الإنترنت.")
+            return False
+
 
         
 
-        
 
-      
     def clear_list(self,name):
         if name == "home":
             # حذف جميع العناصر من QListWidget
@@ -215,8 +273,9 @@ class MainWindow(QMainWindow):
     #############################
     #"""
     def test(self):
-
-        self.show_msg() 
+        for i in range(5):
+            self.listWidget_2.addItem(f"{str(i)}")
+            self.listWidget_3.addItem(f"{str(i)}") 
     #"""
     def get_first_value(self):
         
@@ -328,8 +387,7 @@ class MainWindow(QMainWindow):
 
         else:
             self.check_word(email,False)
-            #self.create_file_accounts_active(email)
-            #self.create_file_accounts_bad_active(email)
+            
             print(f"bad: {email}")
             page_text = ""
             self.driver.get(self.url)
@@ -417,7 +475,6 @@ class MainWindow(QMainWindow):
                 pass
     """
     def open_br(self):
-        self.label_7.setText("المتصفح يعمل")
         self.options = uc.ChromeOptions()
         self.options.headless = False
                 # stop msg
@@ -427,20 +484,15 @@ class MainWindow(QMainWindow):
                 #"profile.default_content_setting_values.notifications" : 2}
         #options.add_experimental_option("prefs",prefs)
         self.driver = uc.Chrome(options = self.options)
+        self.label_7.setText("المتصفح يعمل")
         self.label_7.setStyleSheet("color:green")
-    """
-    def len_email(self):
-        try:
-            with open('Email.txt', 'r') as f:
-                lines = f.readlines()
-            self.num_email = int(len(lines))
-        except Exception as e:
-            print("Erorr fun > len_email")
-    """
+
 
 
     def open_file(self):
         self.clear_list("home")
+        
+        ##############
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(self, "فتح ملف نصي", "Email.txt", "ملفات النص (*.txt)")
 
@@ -450,9 +502,23 @@ class MainWindow(QMainWindow):
 
                 # قم بتنظيف المحتوى من أي فراغات أو أسطر فارغة
                 content = [line.strip() for line in content if line.strip()]
-
+                
+                
+                try:
+                    # التحقق مما إذا كان العنصر موجودًا في القائمة قبل الحذف
+                    my_list = [item for item in content if "PASSWORD"  not in item]
+                    content = [item for item in my_list if "The email number"  not in item]
+                except Exception as e:
+                    print("خطا في حذف الأعداد في الملفات")
+                
+                ######
+                
                 # قم بإضافة الأسطر إلى QListWidget
                 self.list_widget.addItems(content)
+        #####
+        rows_count = self.list_widget.count()
+        self.label_6.setText(f"مجموع الحسابات: {rows_count}")
+        #self.label_5.setText(f"بدء   0   من    {rows_count}")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
