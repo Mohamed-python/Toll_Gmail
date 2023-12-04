@@ -1,4 +1,4 @@
-#6
+#7
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
         self.pushButton_7.clicked.connect(lambda:self.clear_list("active"))
         self.pushButton_10.clicked.connect(lambda:self.clear_list("bad"))
         self.pushButton_14.clicked.connect(self.exit_app)
+        self.pushButton_19.clicked.connect(self.exit_app)
         self.pushButton_22.clicked.connect(self.close_browser)
         self.pushButton_23.clicked.connect(self.close_browser)
         self.pushButton_23.hide()
@@ -97,8 +98,11 @@ class MainWindow(QMainWindow):
         #self.driver.quit()
         try:
             self.driver.close()
+            self.pushButton_23.hide()
+            self.pushButton_16.show()
         except Exception as e:
             print(e)
+
     def start(self):
         if self.lineEdit.text() != "":
             rows_count = self.list_widget.count()
@@ -197,9 +201,11 @@ class MainWindow(QMainWindow):
             print("driver Exit")
         except:
             pass
-        
-        self.close()
-        sys.exit()  
+        try:
+            self.close()
+            sys.exit()  
+        except:
+            pass
     #استخراج الملفات
     def export_to_txt(self,name_file):
         # الحصول على مسار الملف المستهدف
@@ -528,9 +534,9 @@ class MainWindow(QMainWindow):
 
             #"يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
             #"لم يتمّ العثور على حسابك على Google."
-            test = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-            
-            if test in page_text:
+            text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
+            text_en = "Manage your info, privacy, and security to make Google work better for you"
+            if text_ar or text_en in page_text:
                 try:
                     print("موجود مرحباً حساب نشط")
                     ############
@@ -600,7 +606,10 @@ class MainWindow(QMainWindow):
     def change_pass(self,email,passwd):
         #try login
         page_text = self.driver.page_source
-        if not "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من" in page_text:
+        text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
+        text_en = "Manage your info, privacy, and security to make Google work better for you"
+            
+        if not text_ar in page_text:
             try:
                 self.url = "https://bit.ly/3t1G6fz"
                 self.driver.get(self.url)
@@ -621,7 +630,7 @@ class MainWindow(QMainWindow):
                     pass
                 ##############################################################
                 #password
-                time.sleep(4)
+                time.sleep(3)
                 try:
                     self.driver.find_element(By.NAME, "password").send_keys(passwd)
                 except Exception as e:
@@ -647,58 +656,20 @@ class MainWindow(QMainWindow):
                 #page_text = ""
                 time.sleep(1)
                 self.driver.refresh()
-                #time.sleep(5)
+                #time.sleep(2)
                 page_text = self.driver.page_source
-
-
-                
-
-
-                ############################################
-                
-
-                #"يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-                #"لم يتمّ العثور على حسابك على Google."
-                if "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من" in page_text:
-                    print("موجود مرحباً حساب نشط")
-                    ############
-                    #التاكد اذا كان الحساب موجود 
-                    #self.check_word(email,"change_True")
-                    page_text = ""
-                    time.sleep(3)
-                            
-                        
-                    
-
-                    #تسجيل الخروج
-                    """
-                    try:
-                        #self.driver.execute_script("document.getElementById('h-recaptcha-response').style = 'width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px;';")
-                        #print("Done i'm not reboot")
-                        #self.driver.find_element(By.CSS_SELECTOR, ".gb_b .gb_d").click()
-                        self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
-                        #CSS_SELECTOR
-                    except:
-                        pass
-                    """
-
-                else:
-                    #self.check_word(email,False)
-                    self.check_word(email,"change_False")
-                    print(f"bad: {email}")
-                    page_text = ""
-                    self.driver.get(self.url)
             except Exception as e:
                 print("try login: ",e)
-
+                
         ##########################
         page_text = self.driver.page_source
-        text = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-        pass_new = self.lineEdit_3.text().split()
-        pass_new= pass_new[0]
-    
-
-        if text in page_text:
+        #time.sleep(3)
+        text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
+        text_en = "Manage your info, privacy, and security to make Google work better for you"
+        
+        if text_ar or text_en in page_text:
+            pass_new = self.lineEdit_3.text().split()
+            pass_new= pass_new[0]
             #driver.find_element(By.ID, "identifierId").send_keys(e)
             print("[جاهز للتغير الان]")
             ###########
@@ -717,12 +688,20 @@ class MainWindow(QMainWindow):
                 time.sleep(3)
             except:
                 pass
+
+            #Change password
+            try:
+                self.driver.find_element(By.XPATH, "//span[text()='Change password']").click()
+                time.sleep(3)
+            except:
+                pass
             #time.sleep(2)
             #التحقق من التغير  
             page_text = self.driver.page_source
             
             t = "اقتراحات وإعدادات لمساعدتكِ في الحفاظ على أمان حسابكِ"
-            if t in page_text:
+            text_2_en = "Settings and recommendations to help you keep your account secure"
+            if t or text_2_en in page_text:
                 print("تم التغير بنجاح")
                 self.check_word(email,"change_True")
                 
