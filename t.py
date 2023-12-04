@@ -4,19 +4,12 @@ from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
-from webdriver_manager.chrome import ChromeDriverManager
-
-#QClipboard
 from winotify import Notification
-
 from PyQt5.QtGui import QPixmap,QIcon
 from PyQt5.QtCore import Qt,QSize
 import sys
 import socket
-import webbrowser
 import os
-
-
 from threading import Thread
 
 class MainWindow(QMainWindow):
@@ -28,7 +21,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Google fillter")
 
         self.init_ui()
-
     def init_ui(self):
         path = os.getcwd()
         icoo = f'{str(path)}' + "//img//" + 'google_log.ico'
@@ -48,7 +40,7 @@ class MainWindow(QMainWindow):
         self.list_widget = self.listWidget
         self.pushButton.clicked.connect(self.open_file)
         self.pushButton_2.clicked.connect(self.delete_row_in_home)
-        self.pushButton_4.clicked.connect(lambda:Thread(target=self.open_br).start())
+        #self.pushButton_4.clicked.connect(lambda:Thread(target=self.open_br).start())
         self.pushButton_5.clicked.connect(lambda:Thread(target=self.start).start())
         self.pushButton_6.clicked.connect(lambda:self.export_to_txt("active"))
         self.pushButton_11.clicked.connect(lambda:self.export_to_txt("bad"))
@@ -57,6 +49,8 @@ class MainWindow(QMainWindow):
         self.pushButton_10.clicked.connect(lambda:self.clear_list("bad"))
         self.pushButton_14.clicked.connect(self.exit_app)
 
+        self.pushButton_5.setEnabled(False)
+        #self.pushButton_5.setStyleSheet("background-color: #343541;color:#eee;")
 
         #clear_list
 
@@ -65,7 +59,21 @@ class MainWindow(QMainWindow):
         self.pushButton_12.clicked.connect(self.test)
 
         #self.open_file()
+        
+    def check_and_open_browser(self):
+        try:
+            # Attempt to interact with the existing browser (e.g., get the title)
+            title = self.driver.title
+            print("Browser is open. Title:", title)
+        except Exception:
+            print("Browser is closed. Opening a new one.")
+            # Open a new browser instance if the existing one is closed
+            self.options = uc.ChromeOptions()
+            self.options.headless = False
+            return uc.Chrome(options = self.options)
+    
     def start(self):
+        self.driver = self.check_and_open_browser()
         cunt = 0
         print("test")
         rows_count = self.list_widget.count()
@@ -123,7 +131,6 @@ class MainWindow(QMainWindow):
                 
                 
         #"""
-    
     def show_msg(self,title,ms):
         try:
             toast = Notification(app_id="مرحباً",
@@ -132,9 +139,6 @@ class MainWindow(QMainWindow):
             toast.show()
         except Exception as e:
             print("Erorr show_msg")
-
-    
-    
     def exit_app(self):
         
         try:
@@ -144,8 +148,7 @@ class MainWindow(QMainWindow):
             pass
         
         self.close()
-        sys.exit()
-        
+        sys.exit()  
     #استخراج الملفات
     def export_to_txt(self,name_file):
         # الحصول على مسار الملف المستهدف
@@ -192,7 +195,6 @@ class MainWindow(QMainWindow):
                     print("تم حفظ النصوص في الملف بنجاح.")
                 except Exception as e:
                     print(f"حدث خطأ أثناء حفظ الملف: {e}")
-
     def check_word(self,target_word,booll_active):
         #target_word = self.search_input.text()
         if booll_active == True:
@@ -243,11 +245,6 @@ class MainWindow(QMainWindow):
         except OSError:
             print("فشل في التحقق من اتصال الإنترنت.")
             return False
-
-
-        
-
-
     def clear_list(self,name):
         if name == "home":
             # حذف جميع العناصر من QListWidget
@@ -264,8 +261,6 @@ class MainWindow(QMainWindow):
             if self.listWidget_3.count() > 0:
                 self.listWidget_3.clear()
                 print("Done clear bad")
-        
-
     def delete_row_in_home(self):
         # التأكد من وجود عناصر في القائمة
         if self.list_widget.count() > 0:
@@ -292,11 +287,6 @@ class MainWindow(QMainWindow):
             return first_value
         else:
             print("القائمة فارغة")
-        
-
-
-    
-        
 
     def login(self,email,passwd):
         self.url = "https://bit.ly/3t1G6fz"
@@ -491,9 +481,6 @@ class MainWindow(QMainWindow):
         self.driver = uc.Chrome(options = self.options)
         self.label_7.setText("المتصفح يعمل")
         self.label_7.setStyleSheet("color:green")
-
-
-
     def open_file(self):
         self.clear_list("home")
         
@@ -524,7 +511,8 @@ class MainWindow(QMainWindow):
         rows_count = self.list_widget.count()
         self.label_6.setText(f"مجموع الحسابات: {rows_count}")
         #self.label_5.setText(f"بدء   0   من    {rows_count}")
-
+        if rows_count:
+            self.pushButton_5.setEnabled(True)
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     #app.setStyleSheet(stylesheet)
