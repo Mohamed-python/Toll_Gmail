@@ -1,9 +1,10 @@
-#2
+#3
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
+from webdriver_manager.chrome import ChromeDriverManager
 
 #QClipboard
 from winotify import Notification
@@ -135,13 +136,16 @@ class MainWindow(QMainWindow):
     
     
     def exit_app(self):
-        print("Exit")
+        
         try:
-            self.driver.quit()
+            self.driver.close()
+            print("driver Exit")
         except:
             pass
+        
         self.close()
         sys.exit()
+        
     #استخراج الملفات
     def export_to_txt(self,name_file):
         # الحصول على مسار الملف المستهدف
