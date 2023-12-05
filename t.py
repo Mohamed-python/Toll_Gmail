@@ -1,4 +1,4 @@
-#7
+#8
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -104,88 +104,98 @@ class MainWindow(QMainWindow):
             print(e)
 
     def start(self):
-        if self.lineEdit.text() != "":
-            rows_count = self.list_widget.count()
-            if rows_count:
-                self.pushButton_5.hide()
-                self.pushButton_22.show()
-                c = self.check_and_open_browser()
-                if c == False:
-                    self.options = uc.ChromeOptions()
-                    self.options.headless = False
-                    self.driver = uc.Chrome(options = self.options)
-                    #self.text_br_open = 1
-                elif c == True:
-                    pass
-            
-                
-                print("عدد الصفوف في QListWidget:", rows_count)
-                cunt =+ rows_count
-                ################
-                
-                #"""
-                for i in range(rows_count+1):
-                    #"""
-                    get_pass = str(self.lineEdit.text())
-                    get_pass.replace(" ","")
-                    email = self.get_first_value("home")
-                    try:
-                        email.replace(" ","")
-                    except:
+        check_internet = self.check_internet_connection()
+        if check_internet == True:
+            if self.lineEdit.text() != "":
+                rows_count = self.list_widget.count()
+                if rows_count:
+                    self.pushButton_5.hide()
+                    self.pushButton_22.show()
+
+                    c = self.check_and_open_browser()
+                    
+
+                    if c == False:
+                        self.options = uc.ChromeOptions()
+                        self.options.headless = False
+                        self.driver = uc.Chrome(options = self.options)
+                        #self.text_br_open = 1
+                    elif c == True:
                         pass
-                    ########################
+                
                     
-                    self.label_6.setText(f"عدد الايميلات : {rows_count}")
-                    #print("*"*40)
-                    print(f"Email: {email}, passwprd: {get_pass}")
-                    self.login(email,get_pass)
-                    ##################
-                    check_Internet = self.check_internet_connection()
-                    if check_Internet == True:
-                        print("Check_Internet True")
-                        self.delete_row_in_home("home")
-                    elif check_Internet == False:
-                        self.show_msg("There is no Internet","[!] You don't have an internet connection")
-
-                    ###################
-                    self.label_5.setText(f"بدء {str(1+i)} من {rows_count}")
-
-                    print(f"Account Num ({str(1+i)}) from ({str(rows_count)})")
-                    print("*"*40)
-            
-                    #self.delete_row_in_home()
+                    print("عدد الصفوف في QListWidget:", rows_count)
+                    cunt =+ rows_count
+                    ################
                     
-                    
-                    if rows_count == 1+i:
-                        try:
-                            self.driver.close()
-                        except:
-                            pass
-                    
-                        self.label_7.setText("المتصفح مغلق")
-                        self.label_7.setStyleSheet("")
-                        try:
-                            self.show_msg("تم الإنتهاء","تم إنتهاء الفحص")
-                        except:
-                            pass
-                        try:
-                            self.pushButton_22.hide()
-                            self.pushButton_5.show()
-                        except:
-                            pass
-                        break
                     #"""
+                    for i in range(rows_count+1):
+                        #"""
+                        get_pass = str(self.lineEdit.text())
+                        get_pass.replace(" ","")
+                        email = self.get_first_value("home")
+                        try:
+                            email.replace(" ","")
+                        except:
+                            pass
+                        ########################
+                        
+                        self.label_6.setText(f"عدد الايميلات : {rows_count}")
+                        #print("*"*40)
+                        print(f"Email: {email}, passwprd: {get_pass}")
+                        self.login(email,get_pass)
+                        ##################
+                        check_Internet = self.check_internet_connection()
+                        if check_Internet == True:
+                            print("Check_Internet True")
+                            self.delete_row_in_home("home")
+                        elif check_Internet == False:
+                            self.show_msg("There is no Internet","[!] You don't have an internet connection")
+
+                        ###################
+                        self.label_5.setText(f"بدء {str(1+i)} من {rows_count}")
+
+                        print(f"Account Num ({str(1+i)}) from ({str(rows_count)})")
+                        print("*"*40)
+                
+                        #self.delete_row_in_home()
+                        
+                        
+                        if rows_count == 1+i:
+                            try:
+                                self.driver.close()
+                            except:
+                                pass
+                        
+                            self.label_7.setText("المتصفح مغلق")
+                            self.label_7.setStyleSheet("")
+                            try:
+                                self.show_msg("تم الإنتهاء","تم إنتهاء الفحص")
+                            except:
+                                pass
+                            try:
+                                self.pushButton_22.hide()
+                                self.pushButton_5.show()
+                            except:
+                                pass
+                            break
+                        #"""
+                else:
+                    try:
+                        self.show_msg("خطأ","أدخل ملف الإيميلات أولاً")      
+                    except Exception:
+                        pass
             else:
                 try:
-                    self.show_msg("خطأ","أدخل ملف الإيميلات أولاً")      
+                    self.show_msg("خطأ","أدخل كلمة السر")      
                 except Exception:
                     pass
+        
+        #else check_internet False
         else:
-            try:
-                self.show_msg("خطأ","أدخل كلمة السر")      
-            except Exception:
-                pass
-            #"""
+            print("check_internet False")
+            self.show_msg("خطأ","لا يوجد إنترنت قم بالتحقق من إتصالك بالانرنت")
+    
     def show_msg(self,title,ms):
         try:
             toast = Notification(app_id="مرحباً",
@@ -386,7 +396,7 @@ class MainWindow(QMainWindow):
             socket.create_connection(("www.google.com", 80), timeout=5)
             print("تم التحقق من اتصال الإنترنت بنجاح!")
             return True
-        except OSError:
+        except Exception:
             print("فشل في التحقق من اتصال الإنترنت.")
             return False
     def clear_list(self,name):
@@ -467,110 +477,135 @@ class MainWindow(QMainWindow):
             else:
                 print("القائمة فارغة")
     def login(self,email,passwd):
-            try:
-                self.url = "https://bit.ly/3t1G6fz"
-                self.driver.get(self.url)
-            except:
-                pass
-            #email
-            time.sleep(2)
-            try:
-                self.driver.find_element(By.ID, "identifierId").send_keys(email)
-            except:
-                pass
-            #next
-            time.sleep(1)
-            try:
-                self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
+        try:
+            #check_internet = self.check_internet_connection()
+            #if check_internet == True:
 
-            except:
-                pass
-            try:
-                self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()
-                
-            except:
-                pass
-            ##############################################################
-            #password
-            time.sleep(3)
-            try:
-                self.driver.find_element(By.NAME, "password").send_keys(passwd)
-                
-            except Exception as e:
-                pass
-            try:
-                self.driver.find_element(By.NAME, "Passwd").send_keys(passwd)
-                
-            except Exception as e:
-                pass
-            #############
-            try:
-                self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
-                
-            except:
-                pass
-            try:
-                self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()    
-            except:
-                pass
-            #page_text = ""
-            time.sleep(1)
-            try:
-
-                self.driver.refresh()
-                #time.sleep(5)
-            except:
-                pass
-            try:
-                page_text = self.driver.page_source
-            except:
-                pass
-
-            
-
-
-            ############################################
-            
-
-            #"يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-            #"لم يتمّ العثور على حسابك على Google."
-            text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-            text_en = "Manage your info, privacy, and security to make Google work better for you"
-            if text_ar or text_en in page_text:
                 try:
-                    print("موجود مرحباً حساب نشط")
-                    ############
-                    #التاكد اذا كان الحساب موجود 
-                    self.check_word(email,True)
-                    #self.create_file_accounts_active(email)
-                    print(f"Add Accounts Active: {email}")
-                    #page_text = ""
-                    #time.sleep(3)
+                    self.url = "https://bit.ly/3t1G6fz"
+                    self.driver.get(self.url)
                 except:
-                    pass            
+                    pass
+                #email
+                time.sleep(2)
+                try:
+                    self.driver.find_element(By.ID, "identifierId").send_keys(email)
+                except:
+                    pass
+                #next
+                time.sleep(1)
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
+
+                except:
+                    pass
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()
+                    
+                except:
+                    pass
+                ##############################################################
+                #password
+                time.sleep(3)
+                try:
+                    self.driver.find_element(By.NAME, "password").send_keys(passwd)
+                    
+                except Exception as e:
+                    pass
+                try:
+                    self.driver.find_element(By.NAME, "Passwd").send_keys(passwd)
+                    
+                except Exception as e:
+                    pass
+                #############
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
+                    
+                except:
+                    pass
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()    
+                except:
+                    pass
+                #page_text = ""
+                time.sleep(1)
+                try:
+
+                    self.driver.refresh()
+                    #time.sleep(5)
+                except:
+                    pass
+                try:
+                    page_text = self.driver.page_source
+                
+                except:
+                    pass
+
+                
+                #text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من Google بشكل أفضل."
+                text_ar = "ثمة اقتراحات بشأن الخصوصية"
+                text_en = "Privacy suggestions available"
+                
+                if text_ar in page_text:
+                    try:
+                        print("موجود مرحباً حساب نشط")
+                        ############
+                        #التاكد اذا كان الحساب موجود 
+                        self.check_word(email,True)
+                        #self.create_file_accounts_active(email)
+                        print(f"Add Accounts Active: {email}")
+                        #page_text = ""
+                        #time.sleep(3)
+                    except:
+                        pass            
+                            
                         
-                    
-                try:
-                    #تسجيل الخروج
-                    #"""
-                    self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
-                    
-                    #"""
-                except:
-                    pass
-            else:
-                try:
-                    self.check_word(email,False)
-                    print(f"bad: {email}")
-                    page_text = ""
-                    #self.driver.get(self.url)
-                except:
-                    pass
+                    try:
+                        #تسجيل الخروج
+                        #"""
+                        self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
+                        
+                        #"""
+                    except:
+                        pass
+                elif text_en in page_text:
+                    try:
+                        print("موجود مرحباً حساب نشط")
+                        ############
+                        #التاكد اذا كان الحساب موجود 
+                        self.check_word(email,True)
+                        #self.create_file_accounts_active(email)
+                        print(f"Add Accounts Active: {email}")
+                        #page_text = ""
+                        #time.sleep(3)
+                    except:
+                        pass            
+                            
+                        
+                    try:
+                        #تسجيل الخروج
+                        #"""
+                        self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
+                        
+                        #"""
+                    except:
+                        pass
+                else:
+                    try:
+                        self.check_word(email,False)
+                        print(f"bad: {email}")
+                    except:
+                        pass
 
-            ###########################################
+                ###########################################
+            
+        except:
+            #print("check_internet222")
+            pass
+    
+    ######################################################
     def open_file(self):
         self.clear_list("home")
-        
         ##############
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(self, "فتح ملف نصي", "Email.txt", "ملفات النص (*.txt)")
@@ -821,8 +856,8 @@ class MainWindow(QMainWindow):
             if rows_count:
                 self.pushButton_16.setEnabled(True)
                 
-             
-    ###########################################   
+
+###########################################   
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
