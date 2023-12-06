@@ -1,9 +1,9 @@
-#12
+#13
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow,QFileDialog
 from winotify import Notification,audio
 from PyQt5.QtGui import QPixmap,QIcon
 from PyQt5.QtCore import Qt,QSize
@@ -415,8 +415,8 @@ class MainWindow(QMainWindow):
             # حذف جميع العناصر من QListWidget
             if self.list_widget.count() > 0:
                 self.list_widget.clear()
-                self.list_widget_5.clear()
-                self.list_widget_6.clear()
+                #self.list_widget_5.clear()
+                #self.list_widget_6.clear()
                 print("Done clear home")
         if name == "active":
             # حذف جميع العناصر من QListWidget
