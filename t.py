@@ -1,4 +1,4 @@
-#11
+#12
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow,self).__init__()
         #self.setupUi(self)
                 
-        uic.loadUi('ui/main.ui', self)
+        uic.loadUi('ui\\main.ui', self)
         self.setWindowTitle("Google fillter")
 
         self.init_ui()
@@ -26,12 +26,12 @@ class MainWindow(QMainWindow):
        # self.text_br_open = 0
         path = os.getcwd()
         try:
-            icoo = f'{str(path)}' + "//img//" + 'google_log.ico'
+            icoo = f'{str(path)}' + "\\img\\" + 'google_log.ico'
             icon = QIcon(icoo)
             self.setWindowIcon(icon)
             self.setMinimumSize(QSize(300, 200))
             ############
-            img  = f'{str(path)}' + "//img//" + 'google_logo_icon_170071.ico'
+            img  = f'{str(path)}' + "\\img\\" + 'google_logo_icon_170071.ico'
             pixmap = QPixmap(img)
             # تحديد الصورة لعنصر Label
             self.label_8.setPixmap(pixmap)
@@ -107,6 +107,7 @@ class MainWindow(QMainWindow):
             print(e)
 
     def start(self):
+
         check_internet = self.check_internet_connection()
         if check_internet == True:
             if self.lineEdit.text() != "":
@@ -128,11 +129,16 @@ class MainWindow(QMainWindow):
                 
                     
                     print("عدد الصفوف في QListWidget:", rows_count)
-                    cunt =+ rows_count
-                    ################
+                    
+                    
                     
                     #"""
-                    for i in range(rows_count+1):
+                    ###########################################################################################################
+                    num_stop = 0
+                    while rows_count:
+                        num_stop += 1
+                        #print(rows_count)
+                        #for i in range(rows_count+1):
                         #"""
                         get_pass = str(self.lineEdit.text())
                         get_pass.replace(" ","")
@@ -143,7 +149,7 @@ class MainWindow(QMainWindow):
                             pass
                         ########################
                         
-                        self.label_6.setText(f"عدد الايميلات : {rows_count}")
+                        
                         #print("*"*40)
                         print(f"Email: {email}, passwprd: {get_pass}")
                         self.login(email,get_pass)
@@ -155,16 +161,15 @@ class MainWindow(QMainWindow):
                         elif check_Internet == False:
                             self.show_msg("There is no Internet","[!] You don't have an internet connection")
 
-                        ###################
-                        self.label_5.setText(f"بدء {str(1+i)} من {rows_count}")
-
-                        print(f"Account Num ({str(1+i)}) from ({str(rows_count)})")
-                        print("*"*40)
+                        #print(f"Account Num ({str(i)}) from ({str(rows_count)})")
+                        #print("*"*40)
                 
                         #self.delete_row_in_home()
                         
-                        
-                        if rows_count == 1+i:
+                        rows_count  = self.list_widget.count()
+                        self.label_5.setText(f"تم فحص :{str(num_stop)}")
+                        self.label_6.setText(f"المتبقي: {rows_count}")
+                        if rows_count == 0:
                             try:
                                 self.driver.close()
                             except:
@@ -183,6 +188,8 @@ class MainWindow(QMainWindow):
                                 pass
                             break
                         #"""
+                        
+                
                 else:
                     try:
                         self.show_msg("خطأ","أدخل ملف الإيميلات أولاً")      
@@ -609,7 +616,7 @@ class MainWindow(QMainWindow):
     
     ######################################################
     def open_file(self):
-        self.clear_list("home")
+        #self.clear_list("home")
         ##############
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(self, "فتح ملف نصي", "Email.txt", "ملفات النص (*.txt)")
