@@ -1,16 +1,17 @@
-#10
+#11
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
-from winotify import Notification
+from winotify import Notification,audio
 from PyQt5.QtGui import QPixmap,QIcon
 from PyQt5.QtCore import Qt,QSize
 import sys
 import socket
 import os
 from threading import Thread
+############################
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow,self).__init__()
@@ -203,6 +204,7 @@ class MainWindow(QMainWindow):
             toast = Notification(app_id="مرحباً",
             title=title,
             msg=ms)
+            toast.set_audio(audio.Mail, loop=False)
             toast.show()
         except Exception as e:
             print("Erorr show_msg")
@@ -975,7 +977,7 @@ class MainWindow(QMainWindow):
             #self.label_5.setText(f"بدء   0   من    {rows_count}")
             if rows_count:
                 self.pushButton_16.setEnabled(True)
-                
+
 
 ###########################################   
 if __name__ == "__main__":
