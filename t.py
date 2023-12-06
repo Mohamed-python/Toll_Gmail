@@ -1,4 +1,4 @@
-#8
+#9
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -21,20 +21,23 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Google fillter")
 
         self.init_ui()
-    def init_ui(self):
-        self.text_br_open = 0
-        path = os.getcwd()
-        icoo = f'{str(path)}' + "//img//" + 'google_log.ico'
-        icon = QIcon(icoo)
-        self.setWindowIcon(icon)
-        self.setMinimumSize(QSize(300, 200))
-        ############
-        img  = f'{str(path)}' + "//img//" + 'google_logo_icon_170071.ico'
-        pixmap = QPixmap(img)
 
-        # تحديد الصورة لعنصر Label
-        self.label_8.setPixmap(pixmap)
-        self.label_13.setPixmap(pixmap)
+    def init_ui(self):
+       # self.text_br_open = 0
+        path = os.getcwd()
+        try:
+            icoo = f'{str(path)}' + "//img//" + 'google_log.ico'
+            icon = QIcon(icoo)
+            self.setWindowIcon(icon)
+            self.setMinimumSize(QSize(300, 200))
+            ############
+            img  = f'{str(path)}' + "//img//" + 'google_logo_icon_170071.ico'
+            pixmap = QPixmap(img)
+            # تحديد الصورة لعنصر Label
+            self.label_8.setPixmap(pixmap)
+            self.label_13.setPixmap(pixmap)
+        except Exception:
+            print("erorr img icon window")
         self.label_8.setAlignment(Qt.AlignCenter)
         ###########
         self.tabWidget.setCurrentIndex(0)
@@ -641,9 +644,9 @@ class MainWindow(QMainWindow):
     def change_pass(self,email,passwd):
         #try login
         page_text = self.driver.page_source
-        text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-        text_en = "Manage your info, privacy, and security to make Google work better for you"
-            
+        text_ar = "ثمة اقتراحات بشأن الخصوصية"
+        text_en = "Privacy suggestions available"
+        
         if not text_ar in page_text:
             try:
                 self.url = "https://bit.ly/3t1G6fz"
@@ -694,15 +697,69 @@ class MainWindow(QMainWindow):
                 #time.sleep(2)
                 page_text = self.driver.page_source
             except Exception as e:
+                #self.check_word(email,"change_False")
                 print("try login: ",e)
+        elif not text_en in page_text:
+            try:
+                self.url = "https://bit.ly/3t1G6fz"
+                self.driver.get(self.url)
+                #email
+                time.sleep(2)
+                self.driver.find_element(By.ID, "identifierId").send_keys(email)
+                #next
+                time.sleep(1)
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
+                    
+                except:
+                    pass
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()
+                    
+                except:
+                    pass
+                ##############################################################
+                #password
+                time.sleep(3)
+                try:
+                    self.driver.find_element(By.NAME, "password").send_keys(passwd)
+                except Exception as e:
+                    pass
+                try:
+                    self.driver.find_element(By.NAME, "Passwd").send_keys(passwd)
+                except Exception as e:
+                    pass
+                #############
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='Next']").click()
+                    
+                except:
+                    pass
+                try:
+                    self.driver.find_element(By.XPATH, "//span[text()='التالي']").click()
+                    
+
+                    
+                except:
+                    pass
                 
+                #page_text = ""
+                time.sleep(1)
+                self.driver.refresh()
+                #time.sleep(2)
+                page_text = self.driver.page_source
+            except Exception as e:
+                #self.check_word(email,"change_False")
+                print("try login: ",e)
+        else:
+            self.check_word(email,"change_False")
+        
         ##########################
         page_text = self.driver.page_source
         #time.sleep(3)
-        text_ar = "يمكنك إدارة المعلومات والخصوصية والأمان للاستفادة من"
-        text_en = "Manage your info, privacy, and security to make Google work better for you"
-        
-        if text_ar or text_en in page_text:
+        text_ar = "ثمة اقتراحات بشأن الخصوصية"
+        text_en = "Privacy suggestions available"
+        if text_ar in page_text:
             pass_new = self.lineEdit_3.text().split()
             pass_new= pass_new[0]
             #driver.find_element(By.ID, "identifierId").send_keys(e)
@@ -754,8 +811,71 @@ class MainWindow(QMainWindow):
             else:
                 self.check_word(email,"change_False")
                 print("لم يتم التغير")
+        elif text_en in page_text:
+            pass_new = self.lineEdit_3.text().split()
+            pass_new= pass_new[0]
+            #driver.find_element(By.ID, "identifierId").send_keys(e)
+            print("[جاهز للتغير الان]")
+            ###########
+            url = "https://bit.ly/481EMZ6"
+            self.driver.get(url)
+            #text_ = "ننصحك باختيار كلمة مرور قوية وعدم إعادة استخدامها في حسابات أخرى"
+            #password
+            #confirmation_password
 
+            self.driver.find_element(By.NAME, "password").send_keys(pass_new)  
+            self.driver.find_element(By.NAME, "confirmation_password").send_keys(pass_new)
+            #########
+            #زر تغير بالعربي
+            try:
+                self.driver.find_element(By.XPATH, "//span[text()='تغيير كلمة المرور']").click()
+                time.sleep(3)
+            except:
+                pass
+
+            #Change password
+            try:
+                self.driver.find_element(By.XPATH, "//span[text()='Change password']").click()
+                time.sleep(3)
+            except:
+                pass
+            #time.sleep(2)
+            #التحقق من التغير  
+            page_text = self.driver.page_source
+            
+            t = "اقتراحات وإعدادات لمساعدتكِ في الحفاظ على أمان حسابكِ"
+            text_2_en = "Settings and recommendations to help you keep your account secure"
+            if t or text_2_en in page_text:
+                print("تم التغير بنجاح")
+                self.check_word(email,"change_True")
+                
+                #self.lineEdit_2.setText("")
+                self.lineEdit_3.setText(self.lineEdit_2.text())
+                
+                #تسجيل الخروج
+                #"""
+                try:
+                    self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
+                    time.sleep(2)
+                except:
+                    pass
+                #"""
+            else:
+                self.check_word(email,"change_False")
+                print("لم يتم التغير")
         ############################################
+        else:
+            self.check_word(email,"change_False")
+            
+            #تسجيل الخروج
+            #"""
+            try:
+                self.driver.get("https://accounts.google.com/Logout?ec=GAdAwAE&hl=ar")
+                print("تسجيل الخروج")
+                time.sleep(3)
+            except:
+                pass
+    
     def change_the_password(self):
         if self.lineEdit_2.text() != "" and self.lineEdit_3.text() != "":
             self.pushButton_16.hide()
@@ -805,7 +925,8 @@ class MainWindow(QMainWindow):
                 #################
                 if rows_count == 1+i:
                     try:
-                        self.driver.close()
+                        #self.driver.close()
+                        pass
                     except Exception as e:
                         print(e)
 
