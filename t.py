@@ -1,4 +1,4 @@
-#13
+#14
 import time
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -260,7 +260,7 @@ class MainWindow(QMainWindow):
             rows_count = self.listWidget_3.count()
             if rows_count:
                 file_dialog = QFileDialog()
-                file_path, _ = file_dialog.getSaveFileName(self, "حفظ في ملف نصي", "Bad_active.txt", "ملفات النص (*.txt)")
+                file_path, _ = file_dialog.getSaveFileName(self, "حفظ في ملف نصي", "Bad_accounts.txt", "ملفات النص (*.txt)")
                 if file_path:
                     try:
                         # فتح الملف للكتابة
