@@ -11,7 +11,6 @@ import sys
 import socket
 import os
 from threading import Thread
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow,self).__init__()
@@ -925,7 +924,7 @@ class MainWindow(QMainWindow):
                 #################
                 if rows_count == 1+i:
                     try:
-                        #self.driver.close()
+                        self.driver.close()
                         pass
                     except Exception as e:
                         print(e)
